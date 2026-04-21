@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Consulta por Usuario{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <!-- ERROR -->
+    {% if error %}
+        <div class="alert alert-danger">
+            {{ error }}
+        </div>
+    {% endif %}
+
+    <div class="card-form">
+
+        <!-- HEADER -->
+        <div class="card-form-header">
+            Consulta de Aplicativos por Usuario
+        </div>
+
+        <!-- BODY -->
+        <div class="card-form-body">
+
+            <form method="POST">
+
+                <div class="mb-3">
+                    <label class="form-label">Usuario</label>
+                    <input 
+                        type="text" 
+                        name="usuario" 
+                        class="form-control" 
+                        placeholder="Ingrese el usuario"
+                        value="{{ usuario_val or '' }}"
+                        required
+                        autofocus
+                    >
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-buscar">
+                        Buscar
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+    <!-- RESULTADOS -->
+    {% if resultados %}
+
+        <p class="mt-4 mb-2 text-muted">
+            Se encontraron {{ resultados|length }} resultado(s)
+        </p>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Identificación</th>
+                        <th>Nombre Completo</th>
+                        <th>Dependencia</th>
+                        <th>Cargo</th>
+                        <th>Aplicativo</th>
+                        <th>Rol</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in resultados %}
+                    <tr>
+                        <td>{{ r.usuario }}</td>
+                        <td>{{ r.identificacion or '' }}</td>
+                        <td>{{ r.nombre_completo or '' }}</td>
+                        <td>{{ r.dependencia }}</td>
+                        <td>{{ r.cargo }}</td>
+                        <td>{{ r.aplicativo }}</td>
+                        <td class="text-center">{{ r.rol }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    {% elif usuario_val and not error %}
+
+        <div class="alert alert-info mt-4">
+            No se encontraron resultados para "{{ usuario_val }}"
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

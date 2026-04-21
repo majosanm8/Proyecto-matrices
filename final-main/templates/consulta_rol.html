@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}Consulta por Rol{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+{% if error %}
+
+  <div class="alert alert-danger">{{ error }}</div>
+  {% endif %}
+
+  <div class="card-form">
+    <div class="card-form-header">Consulta por Rol</div>
+
+
+<div class="card-form-body">
+  <form method="POST" id="formConsulta">
+
+    <!-- Aplicativo -->
+    <div class="mb-3">
+      <label class="form-label">Aplicativo</label>
+
+      <select name="aplicativo" id="aplicativo" class="form-select" data-choice-skip>
+        <option value="">Seleccione</option>
+
+        {% for app in aplicativos %}
+        <option value="{{ app }}" {% if aplicativo_val == app %}selected{% endif %}>
+          {{ app }}
+        </option>
+        {% endfor %}
+
+      </select>
+    </div>
+
+    <!-- Rol -->
+    <div class="mb-3">
+      <label class="form-label">Rol</label>
+
+      <select name="rol" id="rol" class="form-select" data-choice-skip>
+        {% if rol_val %}
+          <option value="{{ rol_val }}" selected>{{ rol_val }}</option>
+        {% else %}
+          <option value="">Seleccione un aplicativo primero</option>
+        {% endif %}
+      </select>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-buscar">
+        <span id="btn-text">Buscar</span>
+      </button>
+    </div>
+
+  </form>
+</div>
+
+  </div>
+
+  <!-- Resultados -->
+
+{% if resultados %}
+
+  <p class="mt-4 mb-2 text-muted">
+    Se encontraron {{ resultados|length }} resultado(s)
+  </p>
+
+  <div class="table-responsive">
+
+
+<table class="table table-hover align-middle">
+
+  <thead>
+    <tr>
+      <th>Usuario</th>
+      <th>Identificación</th>
+      <th>Nombre Completo</th>
+      <th>Cargo</th>
+      <th>Área</th>
+      <th>Dependencia</th>
+      <th>Aplicativo</th>
+      <th>Rol</th>
+    </tr>
+  </thead>
+
+  <tbody>
+
+    {% for r in resultados %}
+    <tr>
+      <td>{{ r.usuario or '' }}</td>
+      <td>{{ r.identificacion or '' }}</td>
+      <td>{{ r.nombre_completo or '' }}</td>
+      <td>{{ r.cargo or '' }}</td>
+      <td>{{ r.area or '' }}</td>
+      <td>{{ r.dependencia or '' }}</td>
+      <td>{{ r.aplicativo or '' }}</td>
+      <td class="text-center">{{ r.rol or '' }}</td>
+    </tr>
+    {% endfor %}
+
+  </tbody>
+
+</table>
+
+
+  </div>
+
+{% elif resultados is defined %}
+
+
+
+{% endif %}
+
+</div>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function(){
+
+  const aplicativoSelect = document.getElementById("aplicativo")
+  const rolSelect = document.getElementById("rol")
+
+  // Inicializar Choices.js manualmente
+  const choicesConfig = {
+    searchEnabled: true,
+    itemSelectText: '',
+    shouldSort: false,
+  }
+
+  const aplicativoChoices = new Choices(aplicativoSelect, choicesConfig)
+  const rolChoices = new Choices(rolSelect, choicesConfig)
+
+  function cargarRoles(aplicativo, selectedRol = null) {
+    if(!aplicativo){
+      rolChoices.clearChoices()
+      rolChoices.setChoices([{ value: '', label: 'Seleccione un aplicativo primero', selected: true, disabled: true }], 'value', 'label', true)
+      return
+    }
+
+    // Mostrar un estado de "Cargando..."
+    rolChoices.clearChoices()
+    rolChoices.setChoices([{ value: '', label: 'Cargando roles...', selected: true, disabled: true }], 'value', 'label', true)
+
+    fetch(`/api/roles/${encodeURIComponent(aplicativo)}`)
+      .then(response => response.json())
+      .then(data => {
+        rolChoices.clearChoices()
+        
+        const choices = [
+          { value: '', label: 'Seleccione un rol', selected: !selectedRol, disabled: false }
+        ]
+
+        data.forEach(rol => {
+          choices.push({
+            value: rol,
+            label: rol,
+            selected: (rol === selectedRol)
+          })
+        })
+
+        rolChoices.setChoices(choices, 'value', 'label', true)
+      })
+      .catch(error => {
+        console.error("Error cargando roles:", error)
+        rolChoices.clearChoices()
+        rolChoices.setChoices([{ value: '', label: 'Error al cargar roles', selected: true, disabled: true }], 'value', 'label', true)
+      })
+  }
+
+  // Evento de cambio
+  aplicativoSelect.addEventListener("change", function(event){
+    cargarRoles(event.detail.value)
+  })
+
+  // Cargar inicialmente si hay un aplicativo seleccionado (ej: después de POST)
+  if(aplicativoSelect.value) {
+    cargarRoles(aplicativoSelect.value, "{{ rol_val or '' }}")
+  }
+
+
+  document.getElementById("formConsulta").addEventListener("submit", function(){
+    document.getElementById("btn-text").innerText = "Buscando..."
+  })
+
+})
+
+</script>
+
+{% endblock %}

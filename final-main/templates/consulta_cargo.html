@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}Consulta por Cargo{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+{% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+
+<div class="card-form">
+    <div class="card-form-header">Consulta por Cargo</div>
+
+    <div class="card-form-body">
+        <form method="POST" id="formConsulta">
+
+            <!-- Dependencia -->
+            <div class="mb-3">
+                <label class="form-label">Dependencia</label>
+                <select name="dependencia" id="dependencia" class="form-select" data-choice-skip>
+                    <option value="">Seleccione</option>
+                    {% for dep in dependencias %}
+                    <option value="{{ dep }}" {% if dependencia_val == dep %}selected{% endif %}>
+                        {{ dep }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Cargo -->
+            <div class="mb-3">
+                <label class="form-label">Cargo</label>
+                <select name="cargo" id="cargo" class="form-select" data-choice-skip>
+                    {% if cargo_val %}
+                    <option value="{{ cargo_val }}" selected>{{ cargo_val }}</option>
+                    {% else %}
+                    <option value="">Seleccione una dependencia primero</option>
+                    {% endif %}
+                </select>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-buscar">
+                    <span id="btn-text">Buscar</span>
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+
+{% if resultados %}
+
+<p class="mt-4 mb-2 text-muted">
+    Se encontraron {{ resultados|length }} resultado(s)
+</p>
+
+<div class="table-responsive">
+
+    <table class="table table-hover align-middle">
+
+        <thead>
+            <tr>
+                <th>Usuario</th>
+                <th>Identificación</th>
+                <th>Nombre Completo</th>
+                <th>Cargo</th>
+                <th>Área</th>
+                <th>Dependencia</th>
+                <th>Aplicativo</th>
+                <th>Rol</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for r in resultados %}
+            <tr>
+                <td>{{ r.usuario or '' }}</td>
+                <td>{{ r.identificacion or '' }}</td>
+                <td>{{ r.nombre_completo or '' }}</td>
+                <td>{{ r.cargo or '' }}</td>
+                <td>{{ r.area or '' }}</td>
+                <td>{{ r.dependencia or '' }}</td>
+                <td>{{ r.aplicativo or '' }}</td>
+                <td class="text-center">{{ r.rol or '' }}</td>
+            </tr>
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% elif resultados is defined %}
+
+
+
+{% endif %}
+
+</div>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function(){
+
+  const dependenciaSelect = document.getElementById("dependencia")
+  const cargoSelect = document.getElementById("cargo")
+
+  // Inicializar Choices.js manualmente
+  const choicesConfig = {
+    searchEnabled: true,
+    itemSelectText: '',
+    shouldSort: false,
+
+  }
+
+  const dependenciaChoices = new Choices(dependenciaSelect, choicesConfig)
+  const cargoChoices = new Choices(cargoSelect, choicesConfig)
+
+  function cargarCargos(dependencia, selectedCargo = null) {
+    if(!dependencia){
+      cargoChoices.clearChoices()
+      cargoChoices.setChoices([{ value: '', label: 'Seleccione una dependencia primero', selected: true, disabled: true }], 'value', 'label', true)
+      return
+    }
+
+    cargoChoices.clearChoices()
+    cargoChoices.setChoices([{ value: '', label: 'Cargando cargos...', selected: true, disabled: true }], 'value', 'label', true)
+
+    fetch(`/api/cargos/${encodeURIComponent(dependencia)}`)
+      .then(response => response.json())
+      .then(data => {
+        cargoChoices.clearChoices()
+        
+        const choices = [
+          { value: '', label: 'Seleccione un cargo', selected: !selectedCargo, disabled: false }
+        ]
+
+        data.forEach(cargo => {
+          choices.push({
+            value: cargo,
+            label: cargo,
+            selected: (cargo === selectedCargo)
+          })
+        })
+
+        cargoChoices.setChoices(choices, 'value', 'label', true)
+      })
+      .catch(error => {
+        console.error("Error cargando cargos:", error)
+        cargoChoices.clearChoices()
+        cargoChoices.setChoices([{ value: '', label: 'Error al cargar cargos', selected: true, disabled: true }], 'value', 'label', true)
+      })
+  }
+
+  dependenciaSelect.addEventListener("change", function(event){
+    cargarCargos(event.detail.value)
+  })
+
+  if(dependenciaSelect.value) {
+    cargarCargos(dependenciaSelect.value, "{{ cargo_val or '' }}")
+  }
+
+  document.getElementById("formConsulta").addEventListener("submit", function(){
+    document.getElementById("btn-text").innerText = "Buscando..."
+  })
+
+})
+
+</script>
+
+{% endblock %}

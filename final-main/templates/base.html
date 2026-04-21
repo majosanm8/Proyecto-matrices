@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Gestión de Roles{% endblock %}</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"/>
+
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg banner px-4 py-3">
+    <a class="navbar-brand" href="{{ url_for('home') }}">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" height="42">
+    </a>
+
+    <div class="banner-title-center">
+        Gestión de Roles
+    </div>
+
+    <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto align-items-center">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Consultas</a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="{{ url_for('usuario.consulta_usuario') }}">Usuario</a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('rol.consulta_rol') }}">Rol</a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('cargo.consulta_cargo') }}">Cargo</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<main class="container mt-5 mb-5">
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="footer text-center py-3">
+    © 2026 — Dirección de Seguridad de la Información
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('select:not([data-choice-skip])').forEach(function (el) {
+        if (!el.classList.contains('choices__input')) {
+            new Choices(el, {
+                searchEnabled: true,
+                itemSelectText: '',
+                shouldSort: false,
+                noResultsText: 'No se encontraron resultados',
+            });
+        }
+    });
+});
+</script>
+
+</body>
+</html>

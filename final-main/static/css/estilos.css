@@ -1,0 +1,410 @@
+/* =========================
+   VARIABLES
+========================= */
+
+:root {
+
+    --font-primary: 'Manrope', sans-serif;
+    --font-title: 'Manrope', sans-serif;
+
+    --color-primary: #7a1f3d;
+    --color-secondary: #9b3a4a;
+    --color-accent: #c24f3c;
+
+    --color-bg: #f8f9fa;
+    --color-text: #1a1a1a;
+    --color-muted: #6b6b6b;
+
+    --shadow-soft: 0 4px 14px rgba(0, 0, 0, 0.06);
+    --shadow-medium: 0 12px 28px rgba(0, 0, 0, 0.12);
+    --shadow-strong: 0 18px 40px rgba(0, 0, 0, 0.18);
+
+    --radius-sm: 10px;
+    --radius-md: 14px;
+    --radius-lg: 18px;
+
+    --transition: 0.25s ease;
+}
+
+.form-select {
+    font-family: 'Manrope', sans-serif !important;
+    font-weight: 500; /* Peso de lectura cómoda */
+    border-radius: var(--radius-sm);
+    border: 1px solid #ddd;
+    padding: 10px 14px;
+    background-color: #fff;
+
+    appearance: none; 
+    background-image: url("data:image/svg+xml,..."); /* Aquí Bootstrap pone su flecha */
+}
+
+.form-select:focus {
+    border-color: var(--color-secondary);
+    box-shadow: 0 0 0 3px rgba(155, 58, 74, 0.2);
+}
+/* --- Estilos para Choices.js --- */
+.choices__inner, 
+.choices__list--dropdown, 
+.choices__input {
+    font-family: 'Manrope', sans-serif !important;
+}
+
+.choices__inner {
+    border-radius: var(--radius-sm) !important;
+    border: 1px solid #ddd !important;
+    background-color: #fff !important;
+    min-height: 44px;
+}
+
+.choices__list--dropdown {
+    border-radius: var(--radius-sm) !important;
+    box-shadow: var(--shadow-medium) !important;
+}
+
+.choices__list--dropdown .choices__item--selectable.is-highlighted {
+    background-color: var(--color-secondary) !important;
+    color: #fff !important;
+}
+
+/* =========================
+   RESET
+========================= */
+* {
+    box-sizing: border-box;
+}
+
+/* =========================
+   TIPOGRAFÍA PRO
+========================= */
+body {
+    font-family: var(--font-primary);
+    font-weight: 400;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Títulos */
+h1, h2, h3 {
+    font-family: var(--font-title);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* Labels */
+.form-label {
+    font-family: var(--font-title);
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--color-primary);
+}
+
+/* Inputs */
+.form-control,
+.form-select {
+    font-family: var(--font-primary);
+    font-size: 14.5px;
+    border-radius: var(--radius-sm);
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+/* Focus */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--color-secondary);
+    box-shadow: 0 0 0 3px rgba(155,58,74,0.2);
+}
+
+/* Select opciones */
+select, option {
+    font-family: var(--font-primary);
+}
+
+/* Botones */
+.btn,
+.btn-buscar,
+.btn-primary {
+    font-family: var(--font-title);
+    font-weight: 600;
+    letter-spacing: 0.4px;
+}
+
+/* =========================
+   NAVBAR / BANNER
+========================= */
+.banner {
+    position: relative;
+    background: linear-gradient(
+        90deg,
+        var(--color-primary),
+        var(--color-secondary),
+        var(--color-accent)
+    );
+    box-shadow: var(--shadow-medium);
+    padding: 14px 0;
+}
+
+/* Título centrado */
+.banner-title-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 22px;
+    font-weight: 600;
+    color: #fff;
+}
+
+/* Links */
+.navbar .nav-link {
+    color: #fff !important;
+    font-weight: 500;
+}
+
+.navbar .nav-link:hover {
+    color: #ffe9e3 !important;
+}
+
+/* Logo */
+.navbar-brand {
+    background-color: #ffffff;
+    padding: 4px 8px;
+    border-radius: 10px;
+    z-index: 2;
+}
+
+.navbar-brand img {
+    height: 38px;
+}
+
+/* Flecha */
+.dropdown-toggle::after {
+    margin-left: 8px;
+    transition: var(--transition);
+}
+
+.show > .dropdown-toggle::after {
+    transform: rotate(180deg);
+}
+
+/* =========================
+   DROPDOWN
+========================= */
+.dropdown-menu {
+    animation: fadeIn 0.2s ease;
+    border: none;
+    border-radius: var(--radius-lg);
+    padding: 18px;
+
+    background: linear-gradient(
+        135deg,
+        var(--color-primary),
+        var(--color-secondary),
+        var(--color-accent)
+    );
+
+    backdrop-filter: blur(12px);
+    box-shadow: var(--shadow-strong);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdown-item {
+    padding: 12px 18px;
+    margin-bottom: 10px;
+    border-radius: var(--radius-md);
+    color: #fff;
+    font-weight: 600;
+
+    background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.18);
+
+    transition: var(--transition);
+}
+
+.dropdown-item:hover {
+    transform: translateY(-3px);
+    background: rgba(255,255,255,0.24);
+}
+
+/* =========================
+   CARDS
+========================= */
+.card {
+    background: #fff;
+    border-radius: var(--radius-md);
+    border: none;
+    box-shadow: var(--shadow-soft);
+    transition: var(--transition);
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-medium);
+}
+
+.card-header {
+    background: #f6eeee;
+    font-weight: 600;
+}
+
+/* =========================
+   BOTONES
+========================= */
+.btn-primary {
+    background: var(--color-secondary);
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 8px 24px;
+}
+
+.btn-primary:hover {
+    background: var(--color-primary);
+}
+
+.btn-consulta {
+    background: #fff;
+    border: 2px solid var(--color-secondary);
+    color: var(--color-primary);
+    border-radius: var(--radius-md);
+    padding: 14px 28px;
+    text-decoration: none;
+}
+
+.btn-consulta:hover {
+    background: linear-gradient(
+        90deg,
+        var(--color-primary),
+        var(--color-secondary),
+        var(--color-accent)
+    );
+    color: #fff;
+}
+
+/* =========================
+   TABLAS
+========================= */
+
+.table {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+/* Encabezado rojo único */
+.table thead th {
+    background: var(--color-primary) !important;
+    color: #fff !important;
+    font-weight: 600;
+    padding: 14px;
+    border-right: 1px solid rgba(255,255,255,0.2);
+}
+
+/* quitar línea derecha última columna */
+.table thead th:last-child {
+    border-right: none;
+}
+
+/* filas */
+.table tbody td {
+    padding: 12px;
+    border-top: 1px solid #e6e6e6;
+    border-right: 1px solid #e6e6e6;
+}
+
+/* quitar línea derecha última columna */
+.table tbody td:last-child {
+    border-right: none;
+}
+
+/* hover */
+.table tbody tr:hover {
+    background: #f6ecee;
+}
+
+/* Filas */
+.table tbody td {
+    padding: 12px;
+}
+
+/* Hover */
+.table-hover tbody tr:hover {
+    background: #f6ecee;
+}
+/* =========================
+   FORMULARIOS
+========================= */
+.card-form {
+    background: #fff;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-medium);
+}
+
+.card-form-header {
+    background: linear-gradient(
+        90deg,
+        var(--color-primary),
+        var(--color-secondary),
+        var(--color-accent)
+    );
+    color: #fff;
+    padding: 16px 20px;
+}
+
+.card-form-body {
+    padding: 26px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-buscar {
+    background: var(--color-secondary);
+    color: #fff;
+    border-radius: var(--radius-md);
+    padding: 10px 24px;
+    border: none;
+}
+
+.btn-buscar:hover {
+    background: var(--color-primary);
+}
+
+/* =========================
+   FOOTER
+========================= */
+.footer {
+    font-size: 12px;
+    color: var(--color-muted);
+    padding: 18px 0;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 768px) {
+
+    .banner-title-center {
+        font-size: 16px;
+    }
+
+    .btn-consulta {
+        width: 100%;
+        margin-bottom: 12px;
+    }
+}
