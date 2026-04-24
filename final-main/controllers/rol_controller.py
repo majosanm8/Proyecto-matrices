@@ -1,15 +1,17 @@
 import logging
 from flask import Blueprint, render_template, request, jsonify
+
 from services.rol_service import buscar_por_rol
 from repositories.rol_repository import (
     repo_obtener_aplicativos,
     repo_obtener_roles_por_app
 )
+
 logger = logging.getLogger(__name__)
 rol_bp = Blueprint("rol", __name__)
 
 
-@rol_bp.route("/rol", methods=["GET","POST"])
+@rol_bp.route("/rol", methods=["GET", "POST"])
 def consulta_rol():
 
     resultados = []
@@ -17,20 +19,34 @@ def consulta_rol():
     aplicativo_val = ""
     rol_val = ""
 
-    aplicativos = repo_obtener_aplicativos()
+    # 🔹 Cargar catálogo de aplicativos con manejo de error
+    try:
+        aplicativos = repo_obtener_aplicativos()
+    except Exception as e:
+        logger.error("Error cargando aplicativos: %s", e, exc_info=True)
+        aplicativos = []
+        error = "No se pudieron cargar los aplicativos"
 
     if request.method == "POST":
 
-        aplicativo_val = request.form.get("aplicativo","").strip()
-        rol_val = request.form.get("rol","").strip()
+        aplicativo_val = (request.form.get("aplicativo") or "").strip()
+        rol_val = (request.form.get("rol") or "").strip()
 
         if not aplicativo_val or not rol_val:
             error = "Por favor, complete ambos campos: Aplicativo y Rol."
         else:
             try:
                 resultados = buscar_por_rol(rol_val, aplicativo_val)
+
+                # 🔹 Feedback al usuario si no hay datos
+                if not resultados:
+                    error = "No se encontraron resultados"
+
             except Exception as e:
-                logger.error("Error al buscar por Rol: '%s' en Aplicativo: '%s'", rol_val, aplicativo_val, exc_info=True)
+                logger.error(
+                    "Error al buscar por Rol: '%s' en Aplicativo: '%s'",
+                    rol_val, aplicativo_val, exc_info=True
+                )
                 error = "Ocurrió un error al realizar la búsqueda."
 
     return render_template(
@@ -46,11 +62,18 @@ def consulta_rol():
 @rol_bp.route("/api/roles/<path:aplicativo>")
 def api_roles(aplicativo):
     try:
+        aplicativo = (aplicativo or "").strip()
+
+        if not aplicativo:
+            return jsonify({"error": "Aplicativo requerido"}), 400
+
         roles = repo_obtener_roles_por_app(aplicativo)
-        return jsonify(roles)
+
+        return jsonify(roles if roles else [])
+
     except Exception as e:
-        logger.error("Error al obtener roles para Aplicativo: '%s'", aplicativo, exc_info=True)
-        roles = []
-        return jsonify([]), 500
-
-
+        logger.error(
+            "Error al obtener roles para Aplicativo: '%s'",
+            aplicativo, exc_info=True
+        )
+        return jsonify({"error": "Error interno"}), 500

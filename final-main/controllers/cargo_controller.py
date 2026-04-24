@@ -22,20 +22,29 @@ def consulta_cargo():
     cargo_val = ""
     dependencia_val = ""
 
-    dependencias = repo_obtener_dependencias()
+    try:
+        dependencias = repo_obtener_dependencias()
+    except Exception as e:
+        logger.error("Error cargando dependencias: %s", e)
+        dependencias = []
+        error = "No se pudieron cargar las dependencias"
 
     if request.method == "POST":
 
-        cargo_val = request.form.get("cargo", "").strip()
-        dependencia_val = request.form.get("dependencia", "").strip()
+        cargo_val = (request.form.get("cargo") or "").strip()
+        dependencia_val = (request.form.get("dependencia") or "").strip()
 
         if not cargo_val or not dependencia_val:
             error = "Debe seleccionar una dependencia y un cargo"
         else:
             try:
                 resultados = buscar_por_cargo(cargo_val, dependencia_val)
+
+                if not resultados:
+                    error = "No se encontraron resultados"
+
             except Exception as e:
-                logger.error("Error consultando cargo: %s", e)
+                logger.error("Error consultando cargo: %s", e, exc_info=True)
                 error = "Ocurrió un error al consultar"
 
     return render_template(
@@ -51,8 +60,15 @@ def consulta_cargo():
 @cargo_bp.route("/api/cargos/<path:dependencia>")
 def api_cargos(dependencia):
     try:
+        dependencia = (dependencia or "").strip()
+
+        if not dependencia:
+            return jsonify({"error": "Dependencia requerida"}), 400
+
         cargos = repo_obtener_cargos_por_dependencia(dependencia)
-        return jsonify(cargos)
+
+        return jsonify(cargos if cargos else [])
+
     except Exception as e:
-        logger.error("Error en API cargos: %s", e)
-        return jsonify([]), 500
+        logger.error("Error en API cargos: %s", e, exc_info=True)
+        return jsonify({"error": "Error interno"}), 500

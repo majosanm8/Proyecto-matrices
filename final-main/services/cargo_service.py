@@ -3,8 +3,19 @@ from utils.formatter import formatear_resultados
 
 
 def buscar_por_cargo(cargo: str, dependencia: str) -> list[dict]:
-    if not cargo:
+    # 🔹 Validación robusta
+    if not cargo or not dependencia:
         return []
 
-    df = repo_buscar_cargo(cargo, dependencia)
-    return formatear_resultados(df)
+    try:
+        resultados = repo_buscar_cargo(cargo, dependencia)
+
+        # 🔹 Si no hay resultados, evita procesar de más
+        if not resultados:
+            return []
+
+        return formatear_resultados(resultados)
+
+    except Exception as e:
+        # Aquí podrías loggear si quieres
+        return []

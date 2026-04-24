@@ -3,30 +3,30 @@
 QUERY_BUSCAR_CARGO = """
     SELECT
         usuario,
-        identificacion,
         nombre_completo,
+        identificacion,
         cargo,
         area,
         dependencia,
         rol,
         aplicativo
     FROM usuarios
-    WHERE LOWER(cargo) = LOWER(:cargo)
-      AND LOWER(dependencia) = LOWER(:dependencia)
+    WHERE LOWER(TRIM(cargo)) = LOWER(TRIM(:cargo))
+      AND LOWER(TRIM(dependencia)) = LOWER(TRIM(:dependencia))
     ORDER BY usuario
 """
 
 QUERY_OBTENER_DEPENDENCIAS = """
-SELECT DISTINCT dependencia
+SELECT DISTINCT UPPER(TRIM(dependencia)) as dependencia
 FROM usuarios
 WHERE dependencia IS NOT NULL AND dependencia != ''
 ORDER BY dependencia
 """
 
 QUERY_OBTENER_CARGOS_POR_DEPENDENCIA = """
-SELECT DISTINCT cargo
+SELECT DISTINCT UPPER(TRIM(cargo)) as cargo
 FROM usuarios
-WHERE LOWER(dependencia) = LOWER(:dependencia)
+WHERE LOWER(TRIM(dependencia)) = LOWER(TRIM(:dependencia))
   AND cargo IS NOT NULL AND cargo != ''
 ORDER BY cargo
 """

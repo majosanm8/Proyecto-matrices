@@ -3,8 +3,19 @@ from utils.formatter import formatear_resultados
 
 
 def buscar_por_rol(rol: str, aplicativo: str) -> list[dict]:
-    if not rol:
+    # 🔹 Validación completa
+    if not rol or not aplicativo:
         return []
 
-    df = repo_buscar_rol(rol, aplicativo)
-    return formatear_resultados(df)
+    try:
+        resultados = repo_buscar_rol(rol, aplicativo)
+
+        # 🔹 Evita procesar vacío
+        if not resultados:
+            return []
+
+        return formatear_resultados(resultados)
+
+    except Exception:
+        # Opcional: loggear si quieres trazabilidad
+        return []

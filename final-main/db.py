@@ -6,20 +6,21 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 
-# 🔹 Obtener la ruta del directorio donde está este archivo (db.py)
+# 🔹 Logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# 🔹 Cargar .env desde la raíz del proyecto
 basedir = os.path.abspath(os.path.dirname(__file__))
 dotenv_path = os.path.join(basedir, ".env")
 
-# 🔹 Cargar variables de entorno desde la ruta específica
 if os.path.exists(dotenv_path):
     load_dotenv(dotenv_path)
-    print(f"✅ .env cargado desde: {dotenv_path}")
+    logger.info(f"✅ .env cargado desde: {dotenv_path}")
 else:
-    print(f"⚠️ No se encontró .env en {dotenv_path}")
+    logger.warning(f"⚠️ No se encontró .env en {dotenv_path}")
 
-logger = logging.getLogger(__name__)
-
-# Engine global (singleton)
+# 🔹 Engine global (singleton)
 _engine = None
 
 
@@ -39,43 +40,46 @@ def _crear_engine():
     """
     Crea y valida la conexión a la base de datos.
     """
+    # Forzar recarga de variables de entorno
+    load_dotenv(dotenv_path, override=True)
     database_url = os.getenv("DATABASE_URL")
 
-    # 🔹 Fallback para desarrollo
+    # 🔹 Validación obligatoria
     if not database_url:
-        logger.warning("DATABASE_URL no definida, usando SQLite por defecto")
-        database_url = "sqlite:///dev.db"
+        raise ValueError("❌ DATABASE_URL no está definida en el .env")
 
-    # Argumentos base para el engine
+    # 🔹 Seguridad: ocultar contraseña en logs
+    safe_url = database_url.split("@")[-1] if "@" in database_url else database_url
+    logger.info(f"🔌 Intentando conectar a: {safe_url}")
+
+    # 🔹 Configuración del engine
     engine_kwargs = {
-        "echo": True,
-        "pool_pre_ping": True,
-        "pool_recycle": 3600,
+        "echo": False,              # Cambia a True si quieres ver queries
+        "pool_pre_ping": True,      # Verifica conexiones muertas
+        "pool_recycle": 3600,       # Recicla conexiones cada 1 hora
+        "connect_args": {
+            "sslmode": "require"    # 🔥 OBLIGATORIO para Supabase
+        }
     }
 
-    # 🔹 Solo agregar pool_size y max_overflow si NO es SQLite
+    # 🔹 Configuración de pool solo si no es SQLite
     if not database_url.startswith("sqlite"):
         engine_kwargs.update({
-            "pool_size": 20,
-            "max_overflow": 10,
+            "pool_size": 10,
+            "max_overflow": 5,
             "pool_timeout": 30,
         })
-
-    logger.info("Intentando conectar a: %s", database_url.split('@')[-1] if '@' in database_url else database_url)
 
     try:
         engine = create_engine(database_url, **engine_kwargs)
 
-        # 🔹 Validar conexión de forma explícita
+        # 🔹 Validar conexión
         with engine.connect() as conn:
             conn.execute(text("SELECT 1"))
-            # En SQLAlchemy 2.0+ algunas operaciones pueden requerir commit explícito
-            # aunque SELECT 1 no lo necesite, es buena práctica si se usa con transacciones.
-            
+
         logger.info("✅ Conexión a la base de datos establecida correctamente")
         return engine
 
     except Exception as e:
-        logger.critical("❌ No se pudo conectar a la base de datos: %s", e)
-        # Si falla el engine, podemos intentar retornar un engine de fallback o simplemente fallar
-        raise SQLAlchemyError(f"Error crítico de conexión: {e}") from e
+        logger.critical(f"❌ Error crítico al conectar a la DB: {e}")
+        raise SQLAlchemyError(f"Error de conexión: {e}") from e
