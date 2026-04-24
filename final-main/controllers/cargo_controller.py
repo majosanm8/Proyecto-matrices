@@ -24,10 +24,11 @@ def consulta_cargo():
 
     try:
         dependencias = repo_obtener_dependencias()
+        logger.info(f"Dependencias cargadas: {len(dependencias)}")
     except Exception as e:
-        logger.error("Error cargando dependencias: %s", e)
+        logger.error("Error cargando dependencias: %s", e, exc_info=True)
         dependencias = []
-        error = "No se pudieron cargar las dependencias"
+        error = f"Error técnico: {str(e)}"
 
     if request.method == "POST":
 

@@ -6,7 +6,8 @@ from sqlalchemy import text
 from db import get_engine
 
 # 📂 CAMBIA ESTA RUTA a la carpeta donde tienes TODOS los Excel en OneDrive
-RUTA_CARPETA = r"C:\Users\USER\OneDrive - Universidad Libre\Consulta"
+RUTA_CARPETA = r"C:\Users\USER\OneDrive - Universidad Libre\aplicativo"
+
 
 # 📥 Leer todos los Excel de la carpeta
 def obtener_archivos():
