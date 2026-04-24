@@ -14,8 +14,6 @@ def buscar_por_usuario(usuario: str) -> list[dict]:
     for r in resultados:
         resultados_filtrados.append({
             "usuario": r.get("usuario", ""),
-            "identificacion": r.get("identificacion", ""),
-            "nombre_completo": r.get("nombre_completo", ""),
             "dependencia": r.get("dependencia", ""),
             "cargo": r.get("cargo", ""),
             "aplicativo": r.get("aplicativo", ""),

@@ -3,8 +3,6 @@
 QUERY_BUSCAR_CARGO = """
     SELECT
         usuario,
-        nombre_completo,
-        identificacion,
         cargo,
         area,
         dependencia,

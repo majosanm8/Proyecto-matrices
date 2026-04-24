@@ -4,8 +4,6 @@
 QUERY_BUSCAR_ROL = """
 SELECT
     usuario,
-    nombre_completo,
-    identificacion,
     cargo,
     area,
     dependencia,

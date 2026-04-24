@@ -33,8 +33,6 @@ def limpiar_datos(df, nombre_archivo):
 
     df.columns = [
         "usuario",
-        "nombre_completo",
-        "identificacion",
         "cargo",
         "area",
         "dependencia",
@@ -44,11 +42,6 @@ def limpiar_datos(df, nombre_archivo):
 
     for col in df.columns:
         df[col] = df[col].astype(str).str.strip()
-        # Eliminar el ".0" que a veces agrega Excel a los números
-        if col == "identificacion":
-            df[col] = df[col].apply(lambda x: x.replace(".0", "") if x.endswith(".0") else x)
-            # Reemplazar guiones o "nan" por None (NULL en la DB)
-            df[col] = df[col].apply(lambda x: None if x in ["-", "nan", "None", ""] else x)
 
     # Si la columna aplicativo viene vacía, la llenamos con el nombre del archivo
     df["aplicativo"] = df["aplicativo"].apply(
@@ -68,17 +61,13 @@ def insertar_datos(df, aplicativo):
         for _, row in df.iterrows():
             conn.execute(text("""
                 INSERT INTO usuarios (
-                    usuario, identificacion, nombre_completo,
-                    cargo, area, dependencia, rol, aplicativo
+                    usuario, cargo, area, dependencia, rol, aplicativo
                 )
                 VALUES (
-                    :usuario, :identificacion, :nombre_completo,
-                    :cargo, :area, :dependencia, :rol, :aplicativo
+                    :usuario, :cargo, :area, :dependencia, :rol, :aplicativo
                 )
                 ON CONFLICT (usuario)
                 DO UPDATE SET
-                    identificacion = EXCLUDED.identificacion,
-                    nombre_completo = EXCLUDED.nombre_completo,
                     cargo = EXCLUDED.cargo,
                     area = EXCLUDED.area,
                     dependencia = EXCLUDED.dependencia,

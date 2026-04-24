@@ -65,8 +65,6 @@
         <thead>
             <tr>
                 <th>Usuario</th>
-                <th>Identificación</th>
-                <th>Nombre Completo</th>
                 <th>Cargo</th>
                 <th>Área</th>
                 <th>Dependencia</th>
@@ -80,8 +78,6 @@
             {% for r in resultados %}
             <tr>
                 <td>{{ r.usuario or '' }}</td>
-                <td>{{ r.identificacion or '' }}</td>
-                <td>{{ r.nombre_completo or '' }}</td>
                 <td>{{ r.cargo or '' }}</td>
                 <td>{{ r.area or '' }}</td>
                 <td>{{ r.dependencia or '' }}</td>
